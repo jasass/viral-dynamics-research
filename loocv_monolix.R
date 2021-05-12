@@ -33,6 +33,7 @@ for (i in 1:length(origDataSHIV$animal_id)) {
   project <- paste0(demoPath, "Damped Gomperts - SHIV.mlxtran")
   # Load the project and run population parameter estimation, so R can actually interface with the project
   loadProject(projectFile = project)
+  
   runPopulationParameterEstimation()
   
   # remove the ith data point and sepearate the data frames into the removed data and the rest of the data
@@ -54,12 +55,12 @@ for (i in 1:length(origDataSHIV$animal_id)) {
   #Run population and individual (conditional) parameter estimation with the new 
   # data set
   runPopulationParameterEstimation()
-  runConditionalDistributionSampling()
+  runConditionalModeEstimation()
   
   #Get the new parameter set from the monolix results
   crossvalidParams <-
-    getEstimatedIndividualParameters(method = "conditionalMean")
-  newParams = crossvalidParams$conditionalMean[crossvalidParams$conditionalMean$id == removedData$animal_id,]
+    getEstimatedIndividualParameters(method = "conditionalMode")
+  newParams = crossvalidParams$conditionalMode[crossvalidParams$conditionalMode$id == removedData$animal_id,]
   
   #Run the model with the new parameter set and evaluate the model at the time
   # from the removed data set
@@ -97,11 +98,11 @@ for (i in 1:length(origDataSHIV$animal_id)) {
           BaseData$observationTypes)
   
   runPopulationParameterEstimation()
-  runConditionalDistributionSampling()
+  runConditionalModeEstimation()
   
   crossvalidParams <-
-    getEstimatedIndividualParameters(method = "conditionalMean")
-  newParams = crossvalidParams$conditionalMean[crossvalidParams$conditionalMean$id == removedData$animal_id, ]
+    getEstimatedIndividualParameters(method = "conditionalMode")
+  newParams = crossvalidParams$conditionalMode[crossvalidParams$conditionalMode$id == removedData$animal_id, ]
   
   V0 <- newParams$V0
   lambda1 <- newParams$lambda1
@@ -134,11 +135,11 @@ for (i in 1:length(origDataSHIV$animal_id)) {
           BaseData$observationTypes)
   
   runPopulationParameterEstimation()
-  runConditionalDistributionSampling()
+  runConditionalModeEstimation()
   
   crossvalidParams <-
-    getEstimatedIndividualParameters(method = "conditionalMean")
-  newParams = crossvalidParams$conditionalMean[crossvalidParams$conditionalMean$id == removedData$animal_id, ]
+    getEstimatedIndividualParameters(method = "conditionalMode")
+  newParams = crossvalidParams$conditionalMode[crossvalidParams$conditionalMode$id == removedData$animal_id, ]
   
   V0 <- newParams$V0
   NKT <- newParams$NKT
@@ -156,6 +157,42 @@ for (i in 1:length(origDataSHIV$animal_id)) {
   LOOCV[1 + length(LOOCV$Model), ] <-
     c("PD", 'SHIV', as.numeric(sq_error), removedData$animal_id)
 }
+
+for (i in 1:length(origDataSHIV$animal_id)) {
+  demoPath = 'C:/Users/scama/Dropbox/2019_Summer_Project_Rebound/code/summer-2019/'
+  project <- paste0(demoPath, "Two Stage Decay New - SHIV.mlxtran")
+  loadProject(projectFile = project)
+  runPopulationParameterEstimation()
+  
+  crossvalidData <- origDataSHIV[-c(i), ]
+  removedData <- origDataSHIV[i, ]
+  write.csv(crossvalidData, file = "C:/Users/scama/Dropbox/2019_Summer_Project_Rebound/code/summer-2019/VOP PVL_Rebound_cw_lod_crossvalid.csv", row.names = FALSE)
+  filtereddatfile <-
+    "C:/Users/scama/Dropbox/2019_Summer_Project_Rebound/code/summer-2019/VOP PVL_Rebound_cw_lod_crossvalid.csv"
+  BaseData <- getData()
+  setData(filtereddatfile,
+          BaseData$headerTypes,
+          BaseData$observationTypes)
+  
+  runPopulationParameterEstimation()
+  runConditionalModeEstimation()
+  
+  crossvalidParams <-
+    getEstimatedIndividualParameters(method = "conditionalMode")
+  newParams = crossvalidParams$conditionalMode[crossvalidParams$conditionalMode$id == removedData$animal_id, ]
+  
+  V0 <- newParams$V0
+  delta <- newParams$delta
+  gamma <- newParams$gamma
+  r <- newParams$r
+  tau <- removedData$week_post_treatment
+  
+  vl <- V0 * r* exp(-delta*tau) + (1-r)*V0*exp(-gamma*tau)
+  sq_error <- (log10(removedData$viral_load) - log10(vl)) ^ 2
+  LOOCV[1 + length(LOOCV$Model), ] <-
+    c("TSDN", 'SHIV', as.numeric(sq_error), removedData$animal_id)
+}
+
 ## SIV Portion
 
 origDataSIV <-
@@ -179,11 +216,11 @@ for (i in 1:length(origDataSIV$animal_id)) {
           BaseData$observationTypes)
   
   runPopulationParameterEstimation()
-  runConditionalDistributionSampling()
+  runConditionalModeEstimation()
   
   crossvalidParams <-
-    getEstimatedIndividualParameters(method = "conditionalMean")
-  newParams = crossvalidParams$conditionalMean[crossvalidParams$conditionalMean$id == removedData$animal_id, ]
+    getEstimatedIndividualParameters(method = "conditionalMode")
+  newParams = crossvalidParams$conditionalMode[crossvalidParams$conditionalMode$id == removedData$animal_id, ]
   
   V0 <- newParams$V0
   lambda0 <- newParams$lambda0
@@ -218,11 +255,11 @@ for (i in 1:length(origDataSIV$animal_id)) {
           BaseData$observationTypes)
   
   runPopulationParameterEstimation()
-  runConditionalDistributionSampling()
+  runConditionalModeEstimation()
   
   crossvalidParams <-
-    getEstimatedIndividualParameters(method = "conditionalMean")
-  newParams = crossvalidParams$conditionalMean[crossvalidParams$conditionalMean$id == removedData$animal_id, ]
+    getEstimatedIndividualParameters(method = "conditionalMode")
+  newParams = crossvalidParams$conditionalMode[crossvalidParams$conditionalMode$id == removedData$animal_id, ]
   
   V0 <- newParams$V0
   lambda1 <- newParams$lambda1
@@ -255,11 +292,11 @@ for (i in 1:length(origDataSIV$animal_id)) {
           BaseData$observationTypes)
   
   runPopulationParameterEstimation()
-  runConditionalDistributionSampling()
+  runConditionalModeEstimation()
   
   crossvalidParams <-
-    getEstimatedIndividualParameters(method = "conditionalMean")
-  newParams = crossvalidParams$conditionalMean[crossvalidParams$conditionalMean$id == removedData$animal_id, ]
+    getEstimatedIndividualParameters(method = "conditionalMode")
+  newParams = crossvalidParams$conditionalMode[crossvalidParams$conditionalMode$id == removedData$animal_id, ]
   
   V0 <- newParams$V0
   NKT <- newParams$NKT
@@ -278,6 +315,40 @@ for (i in 1:length(origDataSIV$animal_id)) {
     c("PD", 'SIV', as.numeric(sq_error), removedData$animal_id)
 }
 
+for (i in 1:length(origDataSIV$animal_id)) {
+  demoPath = 'C:/Users/scama/Dropbox/2019_Summer_Project_Rebound/code/summer-2019/'
+  project <- paste0(demoPath, "Two Stage Decay New - SIV.mlxtran")
+  loadProject(projectFile = project)
+  runPopulationParameterEstimation()
+  
+  crossvalidData <- origDataSIV[-c(i), ]
+  removedData <- origDataSIV[i, ]
+  write.csv(crossvalidData, file = "C:/Users/scama/Dropbox/2019_Summer_Project_Rebound/code/summer-2019/InfantR01 - SIV_crossvalid.csv", row.names = FALSE)
+  filtereddatfile <-
+    "C:/Users/scama/Dropbox/2019_Summer_Project_Rebound/code/summer-2019/InfantR01 - SIV_crossvalid.csv"
+  BaseData <- getData()
+  setData(filtereddatfile,
+          BaseData$headerTypes,
+          BaseData$observationTypes)
+  
+  runPopulationParameterEstimation()
+  runConditionalModeEstimation()
+  
+  crossvalidParams <-
+    getEstimatedIndividualParameters(method = "conditionalMode")
+  newParams = crossvalidParams$conditionalMode[crossvalidParams$conditionalMode$id == removedData$animal_id, ]
+  
+  V0 <- newParams$V0
+  delta <- newParams$delta
+  gamma <- newParams$gamma
+  r <- newParams$r
+  tau <- removedData$weeks_post_treatment
+  
+  vl <- V0 * r* exp(-delta*tau) + (1-r)*V0*exp(-gamma*tau)
+  sq_error <- (log10(removedData$viral_load) - log10(vl)) ^ 2
+  LOOCV[1 + length(LOOCV$Model), ] <-
+    c("TSDN", 'SIV', as.numeric(sq_error), removedData$animal_id)
+}
 ## HIV Portion
 
 origDataHIV <-
@@ -301,11 +372,11 @@ for (i in 1:length(origDataHIV$human_id)) {
           BaseData$observationTypes)
   
   runPopulationParameterEstimation()
-  runConditionalDistributionSampling()
+  runConditionalModeEstimation()
   
   crossvalidParams <-
-    getEstimatedIndividualParameters(method = "conditionalMean")
-  newParams = crossvalidParams$conditionalMean[crossvalidParams$conditionalMean$id == removedData$human_id, ]
+    getEstimatedIndividualParameters(method = "conditionalMode")
+  newParams = crossvalidParams$conditionalMode[crossvalidParams$conditionalMode$id == removedData$human_id, ]
   
   V0 <- newParams$V0
   lambda0 <- newParams$lambda0
@@ -340,11 +411,11 @@ for (i in 1:length(origDataHIV$human_id)) {
           BaseData$observationTypes)
   
   runPopulationParameterEstimation()
-  runConditionalDistributionSampling()
+  runConditionalModeEstimation()
   
   crossvalidParams <-
-    getEstimatedIndividualParameters(method = "conditionalMean")
-  newParams = crossvalidParams$conditionalMean[crossvalidParams$conditionalMean$id == removedData$human_id, ]
+    getEstimatedIndividualParameters(method = "conditionalMode")
+  newParams = crossvalidParams$conditionalMode[crossvalidParams$conditionalMode$id == removedData$human_id, ]
   
   V0 <- newParams$V0
   lambda1 <- newParams$lambda1
@@ -377,11 +448,11 @@ for (i in 1:length(origDataHIV$human_id)) {
           BaseData$observationTypes)
   
   runPopulationParameterEstimation()
-  runConditionalDistributionSampling()
+  runConditionalModeEstimation()
   
   crossvalidParams <-
-    getEstimatedIndividualParameters(method = "conditionalMean")
-  newParams = crossvalidParams$conditionalMean[crossvalidParams$conditionalMean$id == removedData$human_id, ]
+    getEstimatedIndividualParameters(method = "conditionalMode")
+  newParams = crossvalidParams$conditionalMode[crossvalidParams$conditionalMode$id == removedData$human_id, ]
   
   V0 <- newParams$V0
   NKT <- newParams$NKT
@@ -398,6 +469,41 @@ for (i in 1:length(origDataHIV$human_id)) {
   sq_error <- (removedData$log_vLoad  - log10(vl)) ^ 2
   LOOCV[1 + length(LOOCV$Model), ] <-
     c("PD", 'HIV', as.numeric(sq_error), removedData$human_id)
+}
+
+for (i in 1:length(origDataHIV$human_id)) {
+  demoPath = 'C:/Users/scama/Dropbox/2019_Summer_Project_Rebound/code/summer-2019/'
+  project <- paste0(demoPath, "Two Stage Decay New - HIV.mlxtran")
+  loadProject(projectFile = project)
+  runPopulationParameterEstimation()
+  
+  crossvalidData <- origDataHIV[-c(i), ]
+  removedData <- origDataHIV[i, ]
+  write.csv(crossvalidData, file = "C:/Users/scama/Dropbox/2019_Summer_Project_Rebound/Decay_Dynamics/Humans/humanData_crossvalid.csv", row.names = FALSE)
+  filtereddatfile <-
+    "C:/Users/scama/Dropbox/2019_Summer_Project_Rebound/Decay_Dynamics/Humans/humanData_crossvalid.csv"
+  BaseData <- getData()
+  setData(filtereddatfile,
+          BaseData$headerTypes,
+          BaseData$observationTypes)
+  
+  runPopulationParameterEstimation()
+  runConditionalModeEstimation()
+  
+  crossvalidParams <-
+    getEstimatedIndividualParameters(method = "conditionalMode")
+  newParams = crossvalidParams$conditionalMode[crossvalidParams$conditionalMode$id == removedData$human_id, ]
+  
+  V0 <- newParams$V0
+  delta <- newParams$delta
+  gamma <- newParams$gamma
+  r <- newParams$r
+  tau <- removedData$time_relative
+  
+  vl <- V0 * r* exp(-delta*tau) + (1-r)*V0*exp(-gamma*tau)
+  sq_error <- (removedData$log_vLoad  - log10(vl)) ^ 2
+  LOOCV[1 + length(LOOCV$Model), ] <-
+    c("TSDN", 'HIV', as.numeric(sq_error), removedData$human_id)
 }
 
 #Finally, write the LOOCV data frame to a csv, including the standard error
