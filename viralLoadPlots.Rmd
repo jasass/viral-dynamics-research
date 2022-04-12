@@ -1,0 +1,89 @@
+---
+title: "Viral Load Plots"
+author: "Julian Sass"
+date: "2/8/2022"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+# load libraries
+library(ggplot2) #library for plotting
+library(reshape2) # library for reshaping data (tall-narrow <-> short-wide)
+library(scales)
+library(grid)
+library(gridExtra)
+library(gtable)
+library(dplyr)
+library(forcats)
+library(hrbrthemes)
+library(viridis)
+gc()
+```
+
+```{r}
+shiv_data <-
+  read.csv(file = "Full VOP PVL_Rebound_cw.csv", header =
+             TRUE, sep = ",",fileEncoding = 'UTF-8-BOM')
+
+siv_data <-
+  read.csv(file = "InfantR01 - SIV.csv", header =
+             TRUE, sep = ",",fileEncoding = 'UTF-8-BOM')
+
+hiv_infant_data <-
+  read.csv(file = "Leopard NEW.csv", header =
+             TRUE, sep = ",",fileEncoding = 'UTF-8-BOM')
+hiv_infant_data$code = as.factor(hiv_infant_data$code)
+
+hiv_adult_data <-
+  read.csv(file = "Humans/humanData.csv", header =
+             TRUE, sep = ",",fileEncoding = 'UTF-8-BOM')
+```
+
+```{r}
+ggplot(shiv_data, aes(x = week_infection, y = viral_load)) + scale_colour_discrete("Animal ID") +
+  geom_point(aes(color = animal_id), size = 3) +
+  geom_line(aes(color = animal_id), size = 1) +
+  scale_y_log10(
+    breaks = trans_breaks("log10", function(x)
+      10 ^ x),
+    labels = trans_format("log10", math_format(10 ^ .x)), limits = c(10,1e7)
+  ) +
+  annotation_logticks(sides = "lr") +
+  geom_hline(yintercept = 60, size=1.5) +
+  geom_hline(yintercept = 30, size=1.5, linetype="dashed") +
+  labs(x = "Time Post-Infection (weeks)", y = "Viral Load (copies/mL)") +
+  xlim(0, 20) + geom_vline(xintercept=8,size=1.5) + 
+  annotate("text", x=10.4, y=10^7, label= "ART Initiation") + 
+  annotate("text", x=4, y=23.5, label= "LOD/2") +
+  annotate("text", x=4, y=90, label= "LOD") 
+```
+
+```{r}
+ggplot(siv_data, aes(x = weeks_post_treatment, y = viral_load)) + scale_colour_discrete("Animal ID") +
+  geom_point(aes(color = animal_id), size = 3) +
+  geom_line(aes(color = animal_id), size = 1) +
+  scale_y_log10(
+    breaks = trans_breaks("log10", function(x)
+      10 ^ x),
+    labels = trans_format("log10", math_format(10 ^ .x)), limits = c(10,1e7)
+  ) +
+  annotation_logticks(sides = "lr") +
+  geom_hline(yintercept = 60, size=1.5) +
+  labs(x = "Time Post-ART (weeks)", y = "Viral Load (copies/mL)") + 
+  annotate("text", x=4, y=30, label= "LOD") 
+```
+
+```{r}
+ggplot(hiv_adult_data, aes(x = weeksafterart, y = child_vl)) + scale_colour_discrete("ID") +
+  geom_point(aes(color = code), size = 3) +
+  geom_line(aes(color = code), size = 1) +
+  scale_y_log10(
+    breaks = trans_breaks("log10", function(x)
+      10 ^ x),
+    labels = trans_format("log10", math_format(10 ^ .x)), limits = c(10,1e7)
+  ) +
+  annotation_logticks(sides = "lr") +
+  geom_hline(yintercept = 60, size=1.5) +
+  labs(x = "Time Post-ART (weeks)", y = "Viral Load (copies/mL)") + 
+  annotate("text", x=4, y=30, label= "LOD") 
+```
