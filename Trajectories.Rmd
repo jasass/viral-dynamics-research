@@ -1,0 +1,98 @@
+---
+title: "Example Plots"
+author: "Julian Sass"
+date: "10/14/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+# Load my usual libraries that I use in every R script
+
+library(ggplot2)
+library(dplyr)
+library(plyr)
+library(readxl)
+library(ggplot2)
+library(lme4)
+library(lmerTest)
+library(knitr)
+library(kableExtra)
+library(tidyverse)
+library(scales)
+library(gtools)
+library(deSolve)
+
+plotData <-
+  read.csv(file = "examplePlotData.csv", header =
+             TRUE, sep = ",",fileEncoding = 'UTF-8-BOM')
+```
+
+```{r}
+ggplot(data = plotData, aes(time, pvl)) + geom_point() + ggtitle("Example trajectories for each virus")+ ylab("Log(vRNA Copies / mL Plasma)") + xlab("Time (Weeks)") + facet_wrap(~ virus + model)
+```
+
+```{r}
+modelRuns <- data.frame(time = numeric(), pvl = numeric(),virus = character(), model = character(), stringsAsFactors = FALSE)
+
+MGParams <- data.frame(V0 = numeric(), beta = numeric(), lambda0 = numeric(),gamma = numeric(), tEnd = numeric(), virus = character(), stringsAsFactors = FALSE)
+
+#34
+MGParams[1,] <- list(1142066.03,1.17,4.69,0.39,11.8571429,'HIV - Adult')
+
+#50
+MGParams[2,] <- list(85064.64, 3.1, 9.03, 1.09,11.4285714
+,"HIV - Infant")
+
+#RJc19
+MGParams[3,] <- list(7570839.3, 0.36, 3.31, 0.037,30,"SIV")
+
+#RQc19
+MGParams[4,] <- list(3120640.16, 0.94, 7.27, 0.37,10,"SHIV")
+
+dampeMGompertz <- function(Time, State, Pars){
+  with(as.list(c(State, Pars)), {
+    dV    <- -Lambda * V
+    dLambda <- -beta * Lambda + gamma
+
+    return(list(c(dV, dLambda)))
+  })
+}
+for(i in 1:4) {
+out <- ode(c(V = as.numeric(MGParams[i,"V0"]),Lambda =as.numeric(MGParams[i,"lambda0"])),seq(0,round(as.numeric(MGParams[i,"tEnd"])),by=0.05),dampeMGompertz,MGParams[i,])
+
+modelRuns <- rbind(modelRuns,list(time=out[,1],pvl=log10(out[,2]),virus=rep(MGParams[i,6],length(out[,1])),model=rep("MG",length(out[,1]))))
+}
+```
+
+```{r}
+TSDParams <- data.frame(V0 = numeric(), r = numeric(),delta = numeric(), gam = numeric(),tEnd = numeric(), virus = character(), stringsAsFactors = FALSE)
+
+#34
+TSDParams[1,] <- list(1.10646e+6,0.976318,2.71421,0.307251,11.4285714,'HIV - Adult')
+
+#50
+TSDParams[2,] <- list(98503.4,0.0250978,0.269101,3.49897,11.4285714,"HIV - Infant")
+
+#RJc19
+TSDParams[3,] <- list(1.49392e+7,0.999879,2.60206,0.13211,30,"SIV")
+
+#RQc19
+TSDParams[4,] <- list(2.55471e+6,0.00776139,0.695733,8.61667,10,"SHIV")
+
+for(i in 1:4){
+  t = seq(0,round(as.numeric(TSDParams[i,"tEnd"])),by=0.05)
+  V0 = TSDParams[i,1]
+  r = TSDParams[i,2]
+  delta = TSDParams[i,3]
+  gam = TSDParams[i,4]
+  pvl <- log10( V0 * r* exp(-delta*t) + (1-r)*V0*exp(-gam*t))
+  modelRuns <- rbind(modelRuns,list(time=t,pvl=pvl,virus=rep(TSDParams[i,6],length(t)),model=rep("TSD",length(t))))
+  
+}
+```
+
+```{r}
+ggplot(data = modelRuns, aes(time, pvl)) + geom_line(aes(color = model), size = 1) + ylab("Log(vRNA Copies / mL Plasma)") + xlab("Time (Weeks)") + geom_point(data = plotData, size = 2.5) +facet_wrap(~virus, scales="free", nrow = 2) + labs(color = "Model")
+```
+
