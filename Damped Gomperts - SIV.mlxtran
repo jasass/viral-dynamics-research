@@ -1,0 +1,61 @@
+<DATAFILE>
+
+[FILEINFO]
+file='InfantR01 - SIV.csv'
+delimiter = comma
+header = {weeks_post_infection, animal_id, viral_load, log_viral_load, weeks_post_treatment, cens, viral_init}
+
+[CONTENT]
+animal_id = {use=identifier}
+log_viral_load = {use=observation, name=log_viral_load, type=continuous}
+weeks_post_treatment = {use=time}
+cens = {use=censored}
+viral_init = {use=regressor}
+
+<MODEL>
+
+[INDIVIDUAL]
+input = {beta_pop, omega_beta, gamma_pop, omega_gamma, lambda0_pop, omega_lambda0, V0_pop, omega_V0}
+
+DEFINITION:
+beta = {distribution=logNormal, typical=beta_pop, sd=omega_beta}
+gamma = {distribution=logNormal, typical=gamma_pop, sd=omega_gamma}
+lambda0 = {distribution=logNormal, typical=lambda0_pop, sd=omega_lambda0}
+V0 = {distribution=logNormal, typical=V0_pop, sd=omega_V0}
+
+[LONGITUDINAL]
+input = {a}
+
+file = '../../../../lixoft/monolix/monolix2020R1/demos/8.case_studies/model/damped_gompertz_v0.txt'
+
+DEFINITION:
+log_viral_load = {distribution=normal, prediction=LVL, errorModel=constant(a)}
+
+<FIT>
+data = log_viral_load
+model = log_viral_load
+
+<PARAMETER>
+V0_pop = {value=1000000, method=MLE}
+a = {value=1, method=MLE}
+beta_pop = {value=1, method=MLE}
+gamma_pop = {value=1, method=MLE}
+lambda0_pop = {value=1, method=MLE}
+omega_V0 = {value=1, method=MLE}
+omega_beta = {value=1, method=MLE}
+omega_gamma = {value=1, method=MLE}
+omega_lambda0 = {value=1, method=MLE}
+
+<MONOLIX>
+
+[TASKS]
+populationParameters()
+individualParameters(method = {conditionalMean, conditionalMode })
+fim(method = StochasticApproximation)
+logLikelihood(method = ImportanceSampling)
+plotResult(method = {indfits, parameterdistribution, covariancemodeldiagnosis, covariatemodeldiagnosis, obspred, vpc, residualsscatter, residualsdistribution, randomeffects, saemresults })
+
+[SETTINGS]
+GLOBAL:
+exportpath = 'Damped Gomperts - SIV'
+
