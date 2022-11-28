@@ -1,4 +1,11 @@
 # viral-dynamics-research
+Instructions:
+1. Damped Gomperts - ... and Two Stage Decay - ... files are Monolix scripts that will run the respective model fitting scheme for the stated age group based on our data in Monolix.
+  1a. data folder contains all data from the project.
+  1b. model contains the model files used by Monolix.
+2. loocv_monolix.R runs the leave one out cross validation in R and REQUIRES an active Monolix suite to run, as it runs Monolix at each iteration.
+3. Trajectories and viralLoadPlots will reproduce plots from the manuscript in Rstudio.
+
 Manuscript Abstract:
 
 The viral decay following the initiation of antiretroviral therapy in a nonhuman primate
