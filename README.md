@@ -6,7 +6,8 @@ Instructions:
 2. loocv_monolix.R runs the leave one out cross validation in R and REQUIRES an active Monolix suite to run, as it runs Monolix at each iteration.
 3. Trajectories and viralLoadPlots will reproduce plots from the manuscript in Rstudio.
 
-Manuscript Abstract:
+"A simple model for viral decay dynamics and the distribution of
+infected cell life spans in SHIV-infected infant rhesus macaques" abstract:
 
 The viral decay following the initiation of antiretroviral therapy in a nonhuman primate
 model of HIV infection and infant rhesus macaques infected with SHIV.C.CH505 does not
