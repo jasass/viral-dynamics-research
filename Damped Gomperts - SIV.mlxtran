@@ -1,7 +1,7 @@
 <DATAFILE>
 
 [FILEINFO]
-file='InfantR01 - SIV.csv'
+file='../viral-dynamics-research-decay-dynamics/data/InfantR01 - SIV.csv'
 delimiter = comma
 header = {weeks_post_infection, animal_id, viral_load, log_viral_load, weeks_post_treatment, cens, viral_init}
 
@@ -26,7 +26,7 @@ V0 = {distribution=logNormal, typical=V0_pop, sd=omega_V0}
 [LONGITUDINAL]
 input = {a}
 
-file = '../../../../lixoft/monolix/monolix2020R1/demos/8.case_studies/model/damped_gompertz_v0.txt'
+file = '../viral-dynamics-research-decay-dynamics/model/damped_gompertz_v0.txt'
 
 DEFINITION:
 log_viral_load = {distribution=normal, prediction=LVL, errorModel=constant(a)}

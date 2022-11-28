@@ -7,25 +7,29 @@ header = {animal_id, group, week_infection, viral_init, viral_load, cens, week_p
 
 [CONTENT]
 animal_id = {use=identifier}
+viral_init = {use=regressor}
 cens = {use=censored}
 week_post_treatment = {use=time}
 log_viral_load = {use=observation, name=log_viral_load, type=continuous}
 
+[FILTER]
+VOP__PVL_Rebound_cw_lod_filtered = {origin='VOP PVL_Rebound_cw_lod.csv', filter={{removeLines='week_post_treatment==1'}, {removeLines='cens==leftCensored'}}}
+
 <MODEL>
 
 [INDIVIDUAL]
-input = {beta_pop, omega_beta, gamma_pop, omega_gamma, lambda0_pop, omega_lambda0, V0_pop, omega_V0}
+input = {delta_pop, omega_delta, V0_pop, omega_V0, gamma_pop, omega_gamma, r_pop, omega_r}
 
 DEFINITION:
-beta = {distribution=logNormal, typical=beta_pop, sd=omega_beta}
-gamma = {distribution=logNormal, typical=gamma_pop, sd=omega_gamma}
-lambda0 = {distribution=logNormal, typical=lambda0_pop, sd=omega_lambda0}
+delta = {distribution=logNormal, typical=delta_pop, sd=omega_delta}
 V0 = {distribution=logNormal, typical=V0_pop, sd=omega_V0}
+gamma = {distribution=logNormal, typical=gamma_pop, sd=omega_gamma}
+r = {distribution=logitNormal, typical=r_pop, sd=omega_r}
 
 [LONGITUDINAL]
 input = {a}
 
-file = '../viral-dynamics-research-decay-dynamics/model/damped_gompertz_v0.txt'
+file = '../viral-dynamics-research-decay-dynamics/model/two_stage_new.txt'
 
 DEFINITION:
 log_viral_load = {distribution=normal, prediction=LVL, errorModel=constant(a)}
@@ -37,13 +41,13 @@ model = log_viral_load
 <PARAMETER>
 V0_pop = {value=1000000, method=MLE}
 a = {value=1, method=MLE}
-beta_pop = {value=1.599203280281412, method=MLE}
-gamma_pop = {value=1.037937325888697, method=MLE}
-lambda0_pop = {value=9.455300635857084, method=MLE}
+delta_pop = {value=1, method=MLE}
+gamma_pop = {value=1, method=MLE}
 omega_V0 = {value=1, method=MLE}
-omega_beta = {value=1, method=MLE}
+omega_delta = {value=1, method=MLE}
 omega_gamma = {value=1, method=MLE}
-omega_lambda0 = {value=1, method=MLE}
+omega_r = {value=1, method=MLE}
+r_pop = {value=0.5, method=MLE}
 
 <MONOLIX>
 
@@ -56,5 +60,5 @@ plotResult(method = {indfits, parameterdistribution, covariancemodeldiagnosis, c
 
 [SETTINGS]
 GLOBAL:
-exportpath = 'Damped Gomperts - SHIV'
+exportpath = 'Two Stage Decay New - SHIV'
 
