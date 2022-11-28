@@ -25,7 +25,7 @@ V0 = {distribution=logNormal, typical=V0_pop, sd=omega_V0}
 [LONGITUDINAL]
 input = {a}
 
-file = '../../../../lixoft/monolix/monolix2020R1/demos/8.case_studies/model/damped_gompertz_v0.txt'
+file = 'model/damped_gompertz_v0.txt'
 
 DEFINITION:
 log_vLoad = {distribution=normal, prediction=LVL, errorModel=constant(a)}
