@@ -1,0 +1,9 @@
+[LONGITUDINAL]
+input = {V0, NKT, c, delta, mu_m}
+
+
+EQUATION:
+V = V0 * ((1-(NKT/(c-delta))-((c-NKT)/(c-mu_m)))*exp(-c*t) + (NKT/(c-delta))*exp(-delta*t) + ((c-NKT)/(c-mu_m))*exp(-mu_m*t))
+LVL = log10(V)
+OUTPUT:
+output = LVL
