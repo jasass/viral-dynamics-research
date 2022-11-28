@@ -1,5 +1,5 @@
 # viral-dynamics-research
-Code used for my disseration involving viral dynamics
+Manuscript Abstract:
 
 The viral decay following the initiation of antiretroviral therapy in a nonhuman primate
 model of HIV infection and infant rhesus macaques infected with SHIV.C.CH505 does not
