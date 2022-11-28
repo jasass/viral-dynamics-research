@@ -22,20 +22,20 @@ gc()
 
 ```{r}
 shiv_data <-
-  read.csv(file = "Full VOP PVL_Rebound_cw.csv", header =
+  read.csv(file = "data/Full VOP PVL_Rebound_cw.csv", header =
              TRUE, sep = ",",fileEncoding = 'UTF-8-BOM')
 
 siv_data <-
-  read.csv(file = "InfantR01 - SIV.csv", header =
+  read.csv(file = "data/InfantR01 - SIV.csv", header =
              TRUE, sep = ",",fileEncoding = 'UTF-8-BOM')
 
 hiv_infant_data <-
-  read.csv(file = "Leopard NEW.csv", header =
+  read.csv(file = "data/Leopard NEW.csv", header =
              TRUE, sep = ",",fileEncoding = 'UTF-8-BOM')
 hiv_infant_data$code = as.factor(hiv_infant_data$code)
 
 hiv_adult_data <-
-  read.csv(file = "Humans/humanData.csv", header =
+  read.csv(file = "data/humanData.csv", header =
              TRUE, sep = ",",fileEncoding = 'UTF-8-BOM')
 ```
 
