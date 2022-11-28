@@ -1,0 +1,25 @@
+DESCRIPTION: 
+
+
+[LONGITUDINAL]
+input = {V0, beta, lambda0, gamma}
+;BASE = {use=regressor}
+
+EQUATION:
+; Initial conditions
+; Variables are assumed to be at steady state
+t0    = 0
+V_0 = V0
+Lambda_0 = lambda0
+; Dynamical model
+ddt_V = -Lambda*V
+ddt_Lambda = -beta*Lambda + gamma
+
+
+; The measured viral load is the total viral load V = VNI +VI
+; The measured CD4 cell count is the total T = TNI + TL + TA.
+LVL = log10(V)
+;TTOT = T+I
+
+OUTPUT:
+output = {LVL}
